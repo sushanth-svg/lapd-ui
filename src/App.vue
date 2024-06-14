@@ -20,6 +20,14 @@
       <div class="row">
         <div class="col-lg-4">
           <div class="audio_section p-3">
+            <img src="/src/assets/logo.svg" alt="LAPD" class="LAPD_logo">
+            <div class="LAPD_name">
+              <h3>Los <br> Angeles <br>
+              Police<br>
+            Department</h3>
+            </div>
+            <img src="/src/assets/js/mic.svg" alt="LAPD" class="Mic">
+            
             <div class="row">
               <div class="col-lg-12">
                 <!-- Audio section start here -->
@@ -151,6 +159,7 @@ export default {
 <script>
 import axios from 'axios';
 import { COMMON_API_HTTP } from './api/axiosConfig';
+import { withDirectives } from 'vue';
 
 
 export default {
