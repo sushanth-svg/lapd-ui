@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 
-import LAPD from '../../src/views/LAPD.vue';
+import LapdChat from '../../src/LapdChat.vue';
 
 
 const routes =[ 
@@ -13,9 +13,9 @@ const routes =[
   // },
   
   {
-    path: '/LAPD',
-    name: 'LAPD',
-    component: LAPD,
+    path: '/LapdChat',
+    name: 'LapdChat',
+    component: LapdChat,
   },
   
   

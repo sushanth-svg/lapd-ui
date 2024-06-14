@@ -24,7 +24,7 @@ import 'mosha-vue-toastify/dist/style.css';
 import  Loading  from 'vue-loading-overlay'
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from '../src/router/router'
+// import router from '../src/router/router'
 import store from './stores/store';
 import '@popperjs/core';
 import { defineComponent } from "vue";
@@ -35,7 +35,7 @@ import VueApexCharts from "vue3-apexcharts";
 
 const app = createApp(App).component('font-awesome-icon', FontAwesomeIcon)
 app.use(VueApexCharts);
-app.use(router)
+// app.use(router)
 app.use(store);
 //app.use(Modal);
 app.component('loading-overlay', Loading)
