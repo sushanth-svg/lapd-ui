@@ -10,9 +10,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 /* import specific icons */
-import {faAdd, faCircleXmark, faFileMedical, faCaretUp, faCaretDown, faPencil, faCircleCheck, faRotate, faCircleExclamation, faCirclePlus, faMagnifyingGlass, faArrowLeft, faEyeSlash, faEye, faArrowRightFromBracket, faBars, faFile, faCopy, faFileImport, faPaperPlane, faTrash, faToggleOn, faToggleOff, faFilePdf ,faFileWord , faFileAlt ,faFileArchive, faBolt, faFileExcel} from '@fortawesome/free-solid-svg-icons'
+import {faAdd, faCircleXmark, faFileMedical, faCaretUp, faCaretDown, faPencil, faCircleCheck, faRotate, faCircleExclamation, faCirclePlus, faMagnifyingGlass, faArrowLeft, faEyeSlash, faEye, faArrowRightFromBracket, faBars, faFile, faCopy, faFileImport, faPaperPlane, faTrash, faToggleOn, faToggleOff, faFilePdf ,faFileWord , faFileAlt ,faFileArchive, faBolt, faFileExcel, faPlay, faPause, faStop,faRotateRight} from '@fortawesome/free-solid-svg-icons'
 /* add icons to the library */
-library.add(faAdd, faCircleXmark, faFileMedical, faCaretUp, faCaretDown, faPencil, faCircleCheck, faRotate, faCircleExclamation, faCirclePlus, faMagnifyingGlass, faArrowLeft, faEyeSlash, faEye, faArrowRightFromBracket, faBars, faFile, faCopy, faFileImport, faPaperPlane, faTrash,faToggleOn, faToggleOff, faFilePdf, faFileWord ,faFileAlt , faFileArchive, faBolt,faFileExcel);
+library.add(faAdd, faCircleXmark, faFileMedical, faCaretUp, faCaretDown, faPencil, faCircleCheck, faRotate, faCircleExclamation, faCirclePlus, faMagnifyingGlass, faArrowLeft, faEyeSlash, faEye, faArrowRightFromBracket, faBars, faFile, faCopy, faFileImport, faPaperPlane, faTrash,faToggleOn, faToggleOff, faFilePdf, faFileWord ,faFileAlt , faFileArchive, faBolt,faFileExcel, faPlay, faPause, faStop,faRotateRight);
  
 
 //bootstrap min js

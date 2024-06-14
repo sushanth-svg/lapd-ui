@@ -278,4 +278,9 @@ a {
   color: #FF7300 !important;
   background-color: transparent !important;
   border: 1px solid #FF7300;
+}
+
+.sound_box span {
+  cursor: pointer;
+  color: #082567;
 }/*# sourceMappingURL=style.css.map */

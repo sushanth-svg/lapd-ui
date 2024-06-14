@@ -1,17 +1,4 @@
-<!-- src/components/AudioRecorder.vue -->
-<!-- <template>
-  <div>
-    <button @click="startRecording" :disabled="isRecording">Start Recording</button>
-    <button @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
-    <button @click="uploadRecording" :disabled="!audioBlob">Upload Recording</button>
-    <p>Spoken language: {{ transcription }}</p>
-    <p>Translated in english: {{ translatedtext }}</p>
-    <p>Detected language: {{ language }}</p>
-    <p>OpenAI: {{ openai }}</p>
-      
 
-  </div>
-</template> -->
 
 
 <template>
@@ -22,7 +9,6 @@
           <div class="audio_section p-3">
             <div class="row">
               <div class="col-lg-12">
-                <!-- Audio section start here -->
                 <div class="text-center">
                   <div class="audio_icon my-5 pt-5">
                     <font-awesome-icon icon="fa-solid fa-microphone" />
@@ -32,7 +18,6 @@
                   <button type="button" @click="stopRecording" :disabled="!isRecording" class="btn start_btn mb-4">Stop Recording</button>
 
                 </div>
-                <!-- Audio section end here -->
               </div>
             </div>
           </div>
@@ -43,11 +28,9 @@
               <div class="col-lg-12">
                 <div class="chat_section_header">
                   <a>
-                    <!-- <font-awesome-icon class="exc me-4" icon="fa-solid fa-triangle-exclamation" /> -->
                     <img class="exc me-4" src="/src/assets/images/exc_icon.svg" alt="Alert">
                   </a>
                   <a>
-                    <!-- <font-awesome-icon class="delete me-4" icon="fa-solid fa-trash" /> -->
                     <img class="exc me-4" src="/src/assets/images/delete_icon.svg" alt="Delete">
                   </a>
                   
@@ -64,7 +47,7 @@
                   <div class="row">
                     <div class="col-lg-12">
                       
-                      <!-- User chat div start here -->
+                     
                       <div class="user_chat d-flex align-items-star mb-4">
                         <div class="img-box">
                           <img src="/src/assets/images/user-chat.png" alt="User">
@@ -82,47 +65,36 @@
 
 
                       </div>
-                      <!-- User chat div end here -->
-
-                    
-
-
-                      <!-- Lapd chat div start here -->
+                 
                       <div v-if="openai" class="lapd_chat d-flex align-items-start justify-content-end mb-4">
                         <div class="chat_text_div d-flex flex-column align-items-end">
                           <p v-if="openairesponse[0]">{{openairesponse[0]}}</p>
-                          <p v-if="openairesponse[1]">{{openairesponse[1]}}</p>
-                          <p v-if="openairesponse[2]">{{openairesponse[2]}}</p>
+                          <!-- <p v-if="openairesponse[1]">{{openairesponse[1]}}</p> -->
+                          <p v-if="openairesponse[1]">{{openairesponse[1]}}
+                            <br>
+                            <div class="float-end sound_box" v-if="convertedtext">
+                              <span style="margin-right: 10px;">
+                                <font-awesome-icon icon="fa-solid fa-play"  @click="playAudio(convertedtext)" />
+                              </span>
+                              <span style="margin-right: 10px;">
+                                <font-awesome-icon icon="fa-solid fa-pause" @click="pauseAudio(convertedtext)"/>
+                              </span>
+                              <!-- <span>
+                                <font-awesome-icon icon="fa-solid fa-play" v-if="play2" @click="pauseAudio(convertedtext)" />
+                              </span> -->
+                              <span>
+                                <font-awesome-icon icon="fa-solid fa-rotate-right" @click="stopAudio(convertedtext)" />
+                              </span>
+                            </div>
+                          </p> 
+                        
 
                         </div>
                         <div class="img-box">
                           <img src="/src/assets/images/lapd_chat.png" alt="LAPD">
                         </div>
                       </div>
-                      <!-- Lapd chat div end here -->
-
-                      <!-- User chat div start here -->
-                      <!-- <div class="user_chat d-flex align-items-star mb-4">
-                        <div class="img-box">
-                          <img src="/src/assets/images/user-chat.png" alt="User">
-                        </div>
-                        <div class="chat_text_div">
-                          <p>Lorem ipsum </p>
-                        </div>
-                      </div> -->
-                      <!-- User chat div end here -->
-
-                      <!-- Lapd chat div start here -->
-                      <!-- <div class="lapd_chat d-flex align-items-start justify-content-end mb-4">
-                        <div class="chat_text_div d-flex flex-column align-items-end">
-                          <p>Lorem ipsum </p>
-                        </div>
-                        <div class="img-box">
-                          <img src="/src/assets/images/lapd_chat.png" alt="LAPD">
-                        </div>
-                      </div> -->
-                      <!-- Lapd chat div end here -->
-
+                   
                     </div>
                     
                   </div>
@@ -137,11 +109,6 @@
   </section>
 </template>
 
-<!-- <script>
-export default {
- 
-};
-</script> -->
 
 <style scoped>
 
@@ -165,7 +132,12 @@ export default {
       openai:'',
       detectedlanguage:'',
       processing:false,
-     
+      convertedtext:'',
+      isPaused: false,
+      speechSynthesisUtterance: null,
+      play:true,
+      pause:false,
+      play2:false
     };
   },
   methods: {
@@ -176,6 +148,10 @@ clearFields(){
       this.openai=''
       this.detectedlanguage=''
       this.processing=false
+      this.convertedtext=''
+      this.speechSynthesisUtterance= null
+
+
 },
 
     async startRecording() {
@@ -232,7 +208,8 @@ clearFields(){
         this.transcription = response.data.transcription;
         this.translatedtext = response.data.translatedtext;
         this.openai = response.data.openai;
-        this.detectedlanguage=response.data.detectedlanguage
+        this.detectedlanguage=response.data.detectedlanguage;
+        this.convertedtext=response.data.convertedtext
 
         console.log(this.openai)
         this.openairesponse = this.openai.split('\n\n')
@@ -242,7 +219,75 @@ clearFields(){
         this.processing=false
         console.error('Error uploading audio file.', error);
       }
-    }
+    },
+
+
+    async playAudio(text) {
+      if (!text) {
+        console.log('Please enter some text');
+        return;
+      }
+
+      if (this.isPaused && this.speechSynthesisUtterance) {
+            window.speechSynthesis.resume();
+            this.isPaused = false;
+            return;
+          }
+          this.play=false
+          this.pause=true;
+
+      const speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const mediaStreamDestination = audioContext.createMediaStreamDestination();
+      const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+      let audioChunks = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        this.audioUrl = URL.createObjectURL(audioBlob);
+      };
+
+      mediaRecorder.start();
+      window.speechSynthesis.speak(speechSynthesisUtterance);
+
+      speechSynthesisUtterance.onend = () => {
+        mediaRecorder.stop();
+      };
+    },
+
+
+    pauseAudio() {
+     
+          if (window.speechSynthesis.speaking && !this.isPaused) {
+            window.speechSynthesis.pause();
+            this.play2=true
+            this.pause=false
+
+            this.isPaused = true;
+          } else if (this.isPaused) {
+            window.speechSynthesis.resume();
+            this.isPaused = false;
+            this.play2=false
+            this.pause=true 
+          }
+          this.play=true
+          this.pause=false 
+          this.play2=false
+        },
+
+        stopAudio() {
+          window.speechSynthesis.cancel();
+          if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+            this.mediaRecorder.stop();
+          }
+          this.isPaused = false;
+        }
+
+
   }
 };
 </script>
