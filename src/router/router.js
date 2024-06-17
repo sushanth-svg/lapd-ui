@@ -13,7 +13,7 @@ const routes =[
   // },
   
   {
-    path: '/LapdChat',
+    path: '/LAPD/LapdChat',
     name: 'LapdChat',
     component: LapdChat,
   },

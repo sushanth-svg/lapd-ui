@@ -8,8 +8,8 @@ const require = createRequire( import.meta.url );
 
 // https://vitejs.dev/config/
 export default defineConfig({
-//  mode: 'development',
-//  base: '/',
+  mode: 'development',
+  base: '/LAPD',
   plugins: [
     vue(),
     //ckeditor5( { theme: require.resolve( '@ckeditor/ckeditor5-theme-lark' ) } )
@@ -30,7 +30,7 @@ export default defineConfig({
   //             }
         
   //         }
-  //     }
+  //   
   // }
   }
 })
