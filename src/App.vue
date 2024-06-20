@@ -320,6 +320,7 @@ clearFields(){
         openairesponse: this.openairesponse,
       });
 
+      this.playAudio(this.convertedtext,this.detectedlanguage)
 console.log(this.chatJson)
 
       } catch (error) {
