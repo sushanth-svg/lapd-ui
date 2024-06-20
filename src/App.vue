@@ -53,57 +53,129 @@
               <div class="col-lg-12">
                 <div class="chat_box">
                   <div class="row">
-                    <div class="col-lg-12">
-                      
+                    <div class="col-lg-12" v-for="(items,index) in chatJson" :key="index">
                      
-                      <div class="user_chat d-flex align-items-star mb-4">
-                        <div class="img-box">
-                          <img src="/src/assets/images/user-chat.png" alt="User">
-                        </div>
-                        
-                        <div class="chat_text_div" v-if="transcription">
-                          <p>Language detected: {{detectedlanguage}} </p>
-                          <p> <b>{{detectedlanguage}} : </b>{{transcription}} </p>
-                         <p> <b>English : </b>{{translatedtext}}</p>
+
+
+
+                        <div class="user_chat d-flex align-items-star mb-4">
+                                  <div class="img-box">
+                                    <img src="/src/assets/images/user-chat.png" alt="User">
+                                  </div>  
+                                
+                                  <div class="chat_text_div" v-if="items.transcription">
+                                    <p>Language detected: {{items.detectedlanguage}} </p>
+                                    <p> <b>{{items.detectedlanguage}} : </b>{{items.transcription}} </p>
+                                  <p> <b>English : </b>{{items.translatedtext}}</p>
+                                  </div>
+
+                                  
                         </div>
 
-                        <div class="chat_text_div" v-if="processing">
-                          <p> Processing.... </p>
+
+
+       
+                          <div v-if="items.openai" class="lapd_chat d-flex align-items-start justify-content-end mb-4">
+                                <div class="chat_text_div d-flex flex-column align-items-end">
+                                  <!-- <p v-if="items.openairesponse[0]">{{items.openairesponse[0]}}</p> -->
+                                  <p v-if="items.openai">{{items.openai}}
+                                    <br>
+                                    <div class="float-end sound_box" v-if="items.convertedtext">
+                                      <span style="margin-right: 10px;">
+                                        <font-awesome-icon icon="fa-solid fa-play"  @click="playAudio(items.convertedtext,items.detectedlanguage)" />
+                                      </span>
+                                      <span style="margin-right: 10px;">
+                                        <font-awesome-icon icon="fa-solid fa-pause" @click="pauseAudio(items.convertedtext)"/>
+                                      </span>
+                                      <span>
+                                        <font-awesome-icon icon="fa-solid fa-rotate-right" @click="stopAudio(items.convertedtext)" />
+                                      </span>
+                                    </div>
+                                  </p> 
+                                
+
+                                </div>
+                                <div class="img-box">
+                                  <img src="/src/assets/images/lapd_chat.png" alt="LAPD">
+                                </div>  
                           </div>
+         
+                          
 
 
+
+
+
+
+                          
+                     
+                      <!-- <div class="user_chat d-flex align-items-star mb-4">
+                                  <div class="img-box">
+                                    <img src="/src/assets/images/user-chat.png" alt="User">
+                                  </div>  
+                                
+                                  <div class="chat_text_div" v-if="transcription">
+                                    <p>Language detected: {{detectedlanguage}} </p>
+                                    <p> <b>{{detectedlanguage}} : </b>{{transcription}} </p>
+                                  <p> <b>English : </b>{{translatedtext}}</p>
+                                  </div>
+
+                                  <div class="chat_text_div" v-if="processing">
+                                    <p> Processing.... </p>
+                                    </div>
                       </div>
+
+
+
                  
                       <div v-if="openai" class="lapd_chat d-flex align-items-start justify-content-end mb-4">
-                        <div class="chat_text_div d-flex flex-column align-items-end">
-                          <p v-if="openairesponse[0]">{{openairesponse[0]}}</p>
-                          <!-- <p v-if="openairesponse[1]">{{openairesponse[1]}}</p> -->
-                          <p v-if="openairesponse[1]">{{openairesponse[1]}}
-                            <br>
-                            <div class="float-end sound_box" v-if="convertedtext">
-                              <span style="margin-right: 10px;">
-                                <font-awesome-icon icon="fa-solid fa-play"  @click="playAudio(convertedtext)" />
-                              </span>
-                              <span style="margin-right: 10px;">
-                                <font-awesome-icon icon="fa-solid fa-pause" @click="pauseAudio(convertedtext)"/>
-                              </span>
-                              <!-- <span>
-                                <font-awesome-icon icon="fa-solid fa-play" v-if="play2" @click="pauseAudio(convertedtext)" />
-                              </span> -->
-                              <span>
-                                <font-awesome-icon icon="fa-solid fa-rotate-right" @click="stopAudio(convertedtext)" />
-                              </span>
-                            </div>
-                          </p> 
-                        
+                              <div class="chat_text_div d-flex flex-column align-items-end">
+                                <p v-if="openairesponse[0]">{{openairesponse[0]}}</p>
+                                <p v-if="openairesponse[1]">{{openairesponse[1]}}
+                                  <br>
+                                  <div class="float-end sound_box" v-if="convertedtext">
+                                    <span style="margin-right: 10px;">
+                                      <font-awesome-icon icon="fa-solid fa-play"  @click="playAudio(convertedtext,detectedlanguage)" />
+                                    </span>
+                                    <span style="margin-right: 10px;">
+                                      <font-awesome-icon icon="fa-solid fa-pause" @click="pauseAudio(convertedtext)"/>
+                                    </span>
+                                    <span>
+                                      <font-awesome-icon icon="fa-solid fa-rotate-right" @click="stopAudio(convertedtext)" />
+                                    </span>
+                                  </div>
+                                </p> 
+                              
 
-                        </div>
-                        <div class="img-box">
-                          <img src="/src/assets/images/lapd_chat.png" alt="LAPD">
-                        </div>
+                              </div>
+                              <div class="img-box">
+                                <img src="/src/assets/images/lapd_chat.png" alt="LAPD">
+                              </div>  
                       </div>
-                   
+                    -->
+
+
+
+
                     </div>
+
+
+
+
+                      
+                    <div class="user_chat d-flex align-items-star mb-4" v-if="processing">
+                      <div class="img-box">
+                        <img src="/src/assets/images/user-chat.png" alt="User">
+                      </div>  
+                    
+                      <div class="chat_text_div" >
+                        Processing...
+                      </div>
+
+                      
+                 </div>
+
+
                     
                   </div>
                   
@@ -146,7 +218,8 @@ export default {
       speechSynthesisUtterance: null,
       play:true,
       pause:false,
-      play2:false
+      play2:false,
+      chatJson:[]
     };
   },
   methods: {
@@ -159,13 +232,13 @@ clearFields(){
       this.processing=false
       this.convertedtext=''
       this.speechSynthesisUtterance= null
-
+      this.chatJson=[]
 
 },
 
     async startRecording() {
 
-      this.clearFields()
+     // this.clearFields()
 
       try {
         
@@ -201,10 +274,18 @@ clearFields(){
 
 
     async uploadRecording() {
+
+      if(this.chatJson.length > 0){
+        this.chathistoryjsonString = JSON.stringify(this.chatJson);
+      }else{
+        this.chathistoryjsonString = JSON.stringify("");
+      }
+
       if (!this.audioBlob) return;
 
       const formData = new FormData();
       formData.append('file', this.audioBlob, 'audio.wav');
+      formData.append('chathistory', this.chathistoryjsonString);
 
       try {
         const response = await COMMON_API_HTTP.post('/transcribe/', formData, {
@@ -214,15 +295,32 @@ clearFields(){
         });
         this.processing=false
         console.log(response)
+
+
         this.transcription = response.data.transcription;
         this.translatedtext = response.data.translatedtext;
         this.openai = response.data.openai;
         this.detectedlanguage=response.data.detectedlanguage;
         this.convertedtext=response.data.convertedtext
 
+        
+
+
         console.log(this.openai)
         this.openairesponse = this.openai.split('\n\n')
         console.log(this.openairesponse)
+
+
+        this.chatJson.push({
+        transcription: this.transcription,
+        translatedtext: this.translatedtext,
+        openai: this.openai,
+        detectedlanguage: this.detectedlanguage,
+        convertedtext: this.convertedtext,
+        openairesponse: this.openairesponse,
+      });
+
+console.log(this.chatJson)
 
       } catch (error) {
         this.processing=false
@@ -231,7 +329,9 @@ clearFields(){
     },
 
 
-    async playAudio(text) {
+    async playAudio(text,detectedlanguage) {
+      try {
+      console.log("play audio : " + text)
       if (!text) {
         console.log('Please enter some text');
         return;
@@ -242,10 +342,22 @@ clearFields(){
             this.isPaused = false;
             return;
           }
-          this.play=false
-          this.pause=true;
+          // this.play=false
+          // this.pause=true;
 
+
+  
+  
+   // Create SpeechSynthesisUtterance for each segment
       const speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+
+      // Specify the language attribute
+      // if(detectedlanguage.includes("Korean")){
+      // speechSynthesisUtterance.lang = 'ko-KR'; // Korean language
+      // }
+
+
+
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const mediaStreamDestination = audioContext.createMediaStreamDestination();
       const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
@@ -266,6 +378,13 @@ clearFields(){
       speechSynthesisUtterance.onend = () => {
         mediaRecorder.stop();
       };
+ 
+  
+  } catch (error) {
+        console.log(error)
+      //  CreateToaster('No Data Available', '', 'warning');
+      }
+
     },
 
 
@@ -273,19 +392,19 @@ clearFields(){
      
           if (window.speechSynthesis.speaking && !this.isPaused) {
             window.speechSynthesis.pause();
-            this.play2=true
-            this.pause=false
+            // this.play2=true
+            // this.pause=false
 
             this.isPaused = true;
           } else if (this.isPaused) {
             window.speechSynthesis.resume();
-            this.isPaused = false;
-            this.play2=false
-            this.pause=true 
+            // this.isPaused = false;
+            // this.play2=false
+            // this.pause=true 
           }
-          this.play=true
-          this.pause=false 
-          this.play2=false
+          // this.play=true
+          // this.pause=false 
+          // this.play2=false
         },
 
         stopAudio() {
