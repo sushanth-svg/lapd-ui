@@ -22,8 +22,8 @@
                     <font-awesome-icon icon="fa-solid fa-microphone" />
                   </div>
 
-                  <button type="button" @click="startRecording" :disabled="isRecording" class="btn start_btn mb-4">Start Recording</button>
-                  <button type="button" @click="stopRecording" :disabled="!isRecording" class="btn start_btn mb-4">Stop Recording</button>
+                  <button type="button" @click="startListening" :disabled="isRecording" class="btn start_btn mb-4">Start Recording</button>
+                  <button type="button" @click="stopListening" :disabled="!isRecording" class="btn start_btn mb-4">Stop Recording</button>
 
                 </div>
               </div>
@@ -219,65 +219,90 @@ export default {
       play:true,
       pause:false,
       play2:false,
-      chatJson:[]
+      chatJson:[],
+      recognition: null,
+      silenceTimeout: null,
+      audioStream: null
     };
   },
+
+
+  created: function () {
+    this.stopAudio()
+  },
+
   methods: {
-
-clearFields(){
-      this.transcription= ''
-      this.translatedtext=''
-      this.openai=''
-      this.detectedlanguage=''
-      this.processing=false
-      this.convertedtext=''
-      this.speechSynthesisUtterance= null
-      this.chatJson=[]
-
-},
-
-    async startRecording() {
-
-     // this.clearFields()
-
+    clearFields() {
+      this.transcription = '';
+      this.translatedtext = '';
+      this.openai = '';
+      this.detectedlanguage = '';
+      this.processing = false;
+      this.convertedtext = '';
+      this.speechSynthesisUtterance = null;
+      this.chatJson = [];
+    },
+    async startListening() {
       try {
-        
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        this.mediaRecorder = new MediaRecorder(stream);
-        this.mediaRecorder.start();
+        this.audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        this.recognition.continuous = true;
+        this.recognition.interimResults = false;
 
-        this.mediaRecorder.ondataavailable = (event) => {
-          this.audioChunks.push(event.data);
+        this.recognition.onresult = (event) => {
+          clearTimeout(this.silenceTimeout);
+          this.silenceTimeout = setTimeout(() => {
+            this.processing=true
+            this.stopRecording();
+          }, 1000); // Stop after 1 seconds of silence
         };
 
-        this.mediaRecorder.onstop = () => {
-          this.audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-          this.audioChunks = [];
-          this.uploadRecording()
+        this.recognition.onend = () => {
+          if (this.isRecording) {
+            this.startRecording(); // Restart recording if still in recording mode
+          }
         };
 
-        this.isRecording = true;
+        this.recognition.start();
+        this.startRecording();
+
       } catch (err) {
         console.error('Error accessing media devices.', err);
       }
     },
+    startRecording() {
+      this.isRecording = true;
+      this.mediaRecorder = new MediaRecorder(this.audioStream);
+      this.mediaRecorder.start();
+
+      this.mediaRecorder.ondataavailable = (event) => {
+        this.audioChunks.push(event.data);
+      };
+
+      this.mediaRecorder.onstop = () => {
+        this.audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+        this.audioChunks = [];
+        
+        this.uploadRecording();
+      };
+
+    },
     stopRecording() {
-      this.processing=true   
       if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
         this.mediaRecorder.stop();
-        this.isRecording = false;
        
-
       }
     },
-
-
-
+    stopListening() {
+      if (this.recognition) {
+        this.recognition.stop();
+      }
+      this.stopRecording();
+    },
     async uploadRecording() {
-
-      if(this.chatJson.length > 0){
+      if (this.chatJson.length > 0) {
         this.chathistoryjsonString = JSON.stringify(this.chatJson);
-      }else{
+      } else {
         this.chathistoryjsonString = JSON.stringify("");
       }
 
@@ -293,131 +318,315 @@ clearFields(){
             'Content-Type': 'multipart/form-data'
           }
         });
-        this.processing=false
-        console.log(response)
-
+        this.processing = false;
+        console.log(response);
 
         this.transcription = response.data.transcription;
         this.translatedtext = response.data.translatedtext;
         this.openai = response.data.openai;
-        this.detectedlanguage=response.data.detectedlanguage;
-        this.convertedtext=response.data.convertedtext
+        this.detectedlanguage = response.data.detectedlanguage;
+        this.convertedtext = response.data.convertedtext;
+
+        console.log(this.openai);
+        this.openairesponse = this.openai.split('\n\n');
+        console.log(this.openairesponse);
+
+        this.chatJson.push({
+          transcription: this.transcription,
+          translatedtext: this.translatedtext,
+          openai: this.openai,
+          detectedlanguage: this.detectedlanguage,
+          convertedtext: this.convertedtext,
+          openairesponse: this.openairesponse,
+        });
+        this.isRecording = false;
+
+        console.log(this.chatJson);
+        await this.playAudio(this.convertedtext, this.detectedlanguage);
+        // this.startListening();
+      } catch (error) {
+        this.processing = false;
+        console.error('Error uploading audio file.', error);
+      }
+    },
+    async playAudio(text, detectedlanguage) {
+      try {
+        this.stopListening()
+        console.log("play audio : " + text);
+        if (!text) {
+          console.log('Please enter some text');
+          return;
+        }
+
+        if (this.isPaused && this.speechSynthesisUtterance) {
+          window.speechSynthesis.resume();
+          this.isPaused = false;
+          return;
+        }
+
+        this.speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const mediaStreamDestination = audioContext.createMediaStreamDestination();
+        const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+        let audioChunks = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          this.audioUrl = URL.createObjectURL(audioBlob);
+        };
+
+        mediaRecorder.start();
+        window.speechSynthesis.speak(this.speechSynthesisUtterance);
+
+        this.speechSynthesisUtterance.onend = () => {
+          mediaRecorder.stop();
+          this.startListening(); 
+        };
+
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    pauseAudio() {
+      if (window.speechSynthesis.speaking && !this.isPaused) {
+        window.speechSynthesis.pause();
+        this.isPaused = true;
+      } else if (this.isPaused) {
+        window.speechSynthesis.resume();
+        this.isPaused = false;
+      }
+       this.startListening()
+    },
+    stopAudio() {
+      window.speechSynthesis.cancel();
+      if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+        this.mediaRecorder.stop();
+        this.startListening()
+
+      }
+      this.isPaused = false;
+      
+    }
+  }
+
+
+//   methods: {
+
+// clearFields(){
+//       this.transcription= ''
+//       this.translatedtext=''
+//       this.openai=''
+//       this.detectedlanguage=''
+//       this.processing=false
+//       this.convertedtext=''
+//       this.speechSynthesisUtterance= null
+//       this.chatJson=[]
+
+// },
+
+//     async startRecording() {
+
+//      // this.clearFields()
+
+//       try {
+        
+//         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+//         this.mediaRecorder = new MediaRecorder(stream);
+//         this.mediaRecorder.start();
+
+//         this.mediaRecorder.ondataavailable = (event) => {
+//           this.audioChunks.push(event.data);
+//         };
+
+//         this.mediaRecorder.onstop = () => {
+//           this.audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+//           this.audioChunks = [];
+//           this.uploadRecording()
+//         };
+
+//         this.isRecording = true;
+
+
+// // Initialize SpeechRecognition
+//       this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+//         this.recognition.continuous = true;
+//         this.recognition.interimResults = false;
+
+
+//         this.recognition.onresult = (event) => {
+//           clearTimeout(this.silenceTimeout);
+//           this.silenceTimeout = setTimeout(() => {
+//             this.stopRecording();
+//           }, 2000); // Stop after 2 seconds of silence
+//         };
+
+//         this.recognition.start();
+
+
+
+
+//       } catch (err) {
+//         console.error('Error accessing media devices.', err);
+//       }
+//     },
+//     stopRecording() {
+//       this.processing=true   
+//       if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+//         this.mediaRecorder.stop();
+//         this.isRecording = false;
+//       }
+
+//       if (this.recognition) {
+//         this.recognition.stop();
+//       }
+
+//     },
+
+
+
+//     async uploadRecording() {
+
+//       if(this.chatJson.length > 0){
+//         this.chathistoryjsonString = JSON.stringify(this.chatJson);
+//       }else{
+//         this.chathistoryjsonString = JSON.stringify("");
+//       }
+
+//       if (!this.audioBlob) return;
+
+//       const formData = new FormData();
+//       formData.append('file', this.audioBlob, 'audio.wav');
+//       formData.append('chathistory', this.chathistoryjsonString);
+
+//       try {
+//         const response = await COMMON_API_HTTP.post('/transcribe/', formData, {
+//           headers: {
+//             'Content-Type': 'multipart/form-data'
+//           }
+//         });
+//         this.processing=false
+//         console.log(response)
+
+
+//         this.transcription = response.data.transcription;
+//         this.translatedtext = response.data.translatedtext;
+//         this.openai = response.data.openai;
+//         this.detectedlanguage=response.data.detectedlanguage;
+//         this.convertedtext=response.data.convertedtext
 
         
 
 
-        console.log(this.openai)
-        this.openairesponse = this.openai.split('\n\n')
-        console.log(this.openairesponse)
+//         console.log(this.openai)
+//         this.openairesponse = this.openai.split('\n\n')
+//         console.log(this.openairesponse)
 
 
-        this.chatJson.push({
-        transcription: this.transcription,
-        translatedtext: this.translatedtext,
-        openai: this.openai,
-        detectedlanguage: this.detectedlanguage,
-        convertedtext: this.convertedtext,
-        openairesponse: this.openairesponse,
-      });
+//         this.chatJson.push({
+//         transcription: this.transcription,
+//         translatedtext: this.translatedtext,
+//         openai: this.openai,
+//         detectedlanguage: this.detectedlanguage,
+//         convertedtext: this.convertedtext,
+//         openairesponse: this.openairesponse,
+//       });
 
-      this.playAudio(this.convertedtext,this.detectedlanguage)
-console.log(this.chatJson)
+//       // this.playAudio(this.convertedtext,this.detectedlanguage)
+// console.log(this.chatJson)
 
-      } catch (error) {
-        this.processing=false
-        console.error('Error uploading audio file.', error);
-      }
-    },
+//       } catch (error) {
+//         this.processing=false
+//         console.error('Error uploading audio file.', error);
+//       }
+//     },
 
 
-    async playAudio(text,detectedlanguage) {
-      try {
-      console.log("play audio : " + text)
-      if (!text) {
-        console.log('Please enter some text');
-        return;
-      }
+//     async playAudio(text,detectedlanguage) {
+//       try {
+//       console.log("play audio : " + text)
+//       if (!text) {
+//         console.log('Please enter some text');
+//         return;
+//       }
 
-      if (this.isPaused && this.speechSynthesisUtterance) {
-            window.speechSynthesis.resume();
-            this.isPaused = false;
-            return;
-          }
-          // this.play=false
-          // this.pause=true;
+//       if (this.isPaused && this.speechSynthesisUtterance) {
+//             window.speechSynthesis.resume();
+//             this.isPaused = false;
+//             return;
+//           }
+//           // this.play=false
+//           // this.pause=true;
 
 
   
   
-   // Create SpeechSynthesisUtterance for each segment
-      const speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+//    // Create SpeechSynthesisUtterance for each segment
+//       const speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
 
-      // Specify the language attribute
-      // if(detectedlanguage.includes("Korean")){
-      // speechSynthesisUtterance.lang = 'ko-KR'; // Korean language
-      // }
+//       // Specify the language attribute
+//       // if(detectedlanguage.includes("Korean")){
+//       // speechSynthesisUtterance.lang = 'ko-KR'; // Korean language
+//       // }
 
 
 
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const mediaStreamDestination = audioContext.createMediaStreamDestination();
-      const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
-      let audioChunks = [];
+//       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+//       const mediaStreamDestination = audioContext.createMediaStreamDestination();
+//       const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+//       let audioChunks = [];
 
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunks.push(event.data);
-      };
+//       mediaRecorder.ondataavailable = (event) => {
+//         audioChunks.push(event.data);
+//       };
 
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        this.audioUrl = URL.createObjectURL(audioBlob);
-      };
+//       mediaRecorder.onstop = () => {
+//         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+//         this.audioUrl = URL.createObjectURL(audioBlob);
+//       };
 
-      mediaRecorder.start();
-      window.speechSynthesis.speak(speechSynthesisUtterance);
+//       mediaRecorder.start();
+//       window.speechSynthesis.speak(speechSynthesisUtterance);
 
-      speechSynthesisUtterance.onend = () => {
-        mediaRecorder.stop();
-      };
+//       speechSynthesisUtterance.onend = () => {
+//         mediaRecorder.stop();
+//       };
  
   
-  } catch (error) {
-        console.log(error)
-      //  CreateToaster('No Data Available', '', 'warning');
-      }
+//   } catch (error) {
+//         console.log(error)
+//       //  CreateToaster('No Data Available', '', 'warning');
+//       }
 
-    },
+//     },
 
 
-    pauseAudio() {
+//     pauseAudio() {
      
-          if (window.speechSynthesis.speaking && !this.isPaused) {
-            window.speechSynthesis.pause();
-            // this.play2=true
-            // this.pause=false
+//           if (window.speechSynthesis.speaking && !this.isPaused) {
+//             window.speechSynthesis.pause();
+            
+//             this.isPaused = true;
+//           } else if (this.isPaused) {
+//             window.speechSynthesis.resume();
 
-            this.isPaused = true;
-          } else if (this.isPaused) {
-            window.speechSynthesis.resume();
-            // this.isPaused = false;
-            // this.play2=false
-            // this.pause=true 
-          }
-          // this.play=true
-          // this.pause=false 
-          // this.play2=false
-        },
+//           }
+         
+//         },
 
-        stopAudio() {
-          window.speechSynthesis.cancel();
-          if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-            this.mediaRecorder.stop();
-          }
-          this.isPaused = false;
-        }
+//         stopAudio() {
+//           window.speechSynthesis.cancel();
+//           if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+//             this.mediaRecorder.stop();
+//           }
+//           this.isPaused = false;
+//         }
 
 
-  }
+//   }
 };
 </script>
 
