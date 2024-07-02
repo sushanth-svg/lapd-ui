@@ -1,6 +1,3 @@
-
-
-
 <template>
   <section class="layout_container m-0 py-3">
     <div class="container">
@@ -10,11 +7,11 @@
             <img src="/src/assets/logo.svg" alt="LAPD" class="LAPD_logo">
             <div class="LAPD_name">
               <h3>Los <br> Angeles <br>
-              Police<br>
-            Department</h3>
+                Police<br>
+                Department</h3>
             </div>
             <img src="/src/assets/js/mic.svg" alt="LAPD" class="Mic">
-            
+
             <div class="row">
               <div class="col-lg-12">
                 <div class="text-center">
@@ -22,8 +19,10 @@
                     <font-awesome-icon icon="fa-solid fa-microphone" />
                   </div>
 
-                  <button type="button" @click="startListening" :disabled="isRecording" class="btn start_btn mb-4">Start Recording</button>
-                  <button type="button" @click="stopListening" :disabled="!isRecording" class="btn start_btn mb-4">Stop Recording</button>
+                  <button type="button" @click="startListening" :disabled="isRecording" class="btn start_btn mb-4">Start
+                    Recording</button>
+                  <button type="button" @click="stopListening" :disabled="recordingStop" class="btn start_btn mb-4">Stop
+                    Recording</button>
 
                 </div>
               </div>
@@ -41,7 +40,7 @@
                   <a>
                     <img class="exc me-4" src="/src/assets/images/delete_icon.svg" alt="Delete">
                   </a>
-                  
+
                   <div class="search_box">
                     <input type="text" class="form-control" placeholder="Search" aria-describedby="emailHelp" />
                     <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="search-icon" />
@@ -53,62 +52,64 @@
               <div class="col-lg-12">
                 <div class="chat_box">
                   <div class="row">
-                    <div class="col-lg-12" v-for="(items,index) in chatJson" :key="index">
-                     
+                    <div class="col-lg-12" v-for="(items, index) in chatJson" :key="index">
 
 
 
-                        <div class="user_chat d-flex align-items-star mb-4">
-                                  <div class="img-box">
-                                    <img src="/src/assets/images/user-chat.png" alt="User">
-                                  </div>  
-                                
-                                  <div class="chat_text_div" v-if="items.transcription">
-                                    <p>Language detected: {{items.detectedlanguage}} </p>
-                                    <p> <b>{{items.detectedlanguage}} : </b>{{items.transcription}} </p>
-                                  <p> <b>English : </b>{{items.translatedtext}}</p>
-                                  </div>
 
-                                  
+                      <div class="user_chat d-flex align-items-star mb-4">
+                        <div class="img-box">
+                          <img src="/src/assets/images/user-chat.png" alt="User">
+                        </div>
+
+                        <div class="chat_text_div" v-if="items.transcription">
+                          <p>Language detected: {{ items.detectedlanguage }} </p>
+                          <p> <b>{{ items.detectedlanguage }} : </b>{{ items.transcription }} </p>
+                          <p> <b>English : </b>{{ items.translatedtext }}</p>
                         </div>
 
 
+                      </div>
 
-       
-                          <div v-if="items.openai" class="lapd_chat d-flex align-items-start justify-content-end mb-4">
-                                <div class="chat_text_div d-flex flex-column align-items-end">
-                                  <!-- <p v-if="items.openairesponse[0]">{{items.openairesponse[0]}}</p> -->
-                                  <p v-if="items.openai">{{items.openai}}
-                                    <br>
-                                    <div class="float-end sound_box" v-if="items.convertedtext">
-                                      <span style="margin-right: 10px;">
-                                        <font-awesome-icon icon="fa-solid fa-play"  @click="playAudio(items.convertedtext,items.detectedlanguage)" />
-                                      </span>
-                                      <span style="margin-right: 10px;">
-                                        <font-awesome-icon icon="fa-solid fa-pause" @click="pauseAudio(items.convertedtext)"/>
-                                      </span>
-                                      <span>
-                                        <font-awesome-icon icon="fa-solid fa-rotate-right" @click="stopAudio(items.convertedtext)" />
-                                      </span>
-                                    </div>
-                                  </p> 
-                                
 
-                                </div>
-                                <div class="img-box">
-                                  <img src="/src/assets/images/lapd_chat.png" alt="LAPD">
-                                </div>  
+
+
+                      <div v-if="items.convertedtext"
+                        class="lapd_chat d-flex align-items-start justify-content-end mb-4">
+                        <div class="chat_text_div d-flex flex-column align-items-end">
+                          <!-- <p v-if="items.openairesponse[0]">{{items.openairesponse[0]}}</p> -->
+                          <p v-if="items.convertedtext">{{ items.convertedtext }}
+                            <br>
+                          <div class="float-end sound_box" v-if="items.openai">
+                            <span style="margin-right: 10px;">
+                              <font-awesome-icon icon="fa-solid fa-play"
+                                @click="playAudio(openairesponse, items.detectedlanguage)" />
+                            </span>
+                            <span style="margin-right: 10px;">
+                              <font-awesome-icon icon="fa-solid fa-pause" @click="pauseAudio()" />
+                            </span>
+                            <span>
+                              <font-awesome-icon icon="fa-solid fa-rotate-right" @click="stopAudio()" />
+                            </span>
                           </div>
-         
-                          
+                          </p>
+
+
+                        </div>
+                        <div class="img-box">
+                          <img src="/src/assets/images/lapd_chat.png" alt="LAPD">
+                        </div>
+                      </div>
 
 
 
 
 
 
-                          
-                     
+
+
+
+
                       <!-- <div class="user_chat d-flex align-items-star mb-4">
                                   <div class="img-box">
                                     <img src="/src/assets/images/user-chat.png" alt="User">
@@ -162,23 +163,23 @@
 
 
 
-                      
+
                     <div class="user_chat d-flex align-items-star mb-4" v-if="processing">
                       <div class="img-box">
                         <img src="/src/assets/images/user-chat.png" alt="User">
-                      </div>  
-                    
-                      <div class="chat_text_div" >
+                      </div>
+
+                      <div class="chat_text_div">
                         Processing...
                       </div>
 
-                      
-                 </div>
+
+                    </div>
 
 
-                    
+
                   </div>
-                  
+
                 </div>
               </div>
             </div>
@@ -190,9 +191,7 @@
 </template>
 
 
-<style scoped>
-
-</style>
+<style scoped></style>
 
 
 <script>
@@ -205,21 +204,22 @@ export default {
   data() {
     return {
       isRecording: false,
+      recordingStop: true,
       mediaRecorder: null,
       audioChunks: [],
       audioBlob: null,
       transcription: '',
-      translatedtext:'',
-      openai:'',
-      detectedlanguage:'',
-      processing:false,
-      convertedtext:'',
+      translatedtext: '',
+      openai: '',
+      detectedlanguage: '',
+      processing: false,
+      convertedtext: '',
       isPaused: false,
       speechSynthesisUtterance: null,
-      play:true,
-      pause:false,
-      play2:false,
-      chatJson:[],
+      play: true,
+      pause: false,
+      play2: false,
+      chatJson: [],
       recognition: null,
       silenceTimeout: null,
       audioStream: null
@@ -244,6 +244,8 @@ export default {
     },
     async startListening() {
       try {
+        this.isRecording = true;
+        this.recordingStop = false;
         this.audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         this.recognition.continuous = true;
@@ -252,7 +254,9 @@ export default {
         this.recognition.onresult = (event) => {
           clearTimeout(this.silenceTimeout);
           this.silenceTimeout = setTimeout(() => {
-            this.processing=true
+            this.processing = true
+            this.isRecording = true;
+            this.recordingStop = true;
             this.stopRecording();
           }, 1000); // Stop after 1 seconds of silence
         };
@@ -272,6 +276,7 @@ export default {
     },
     startRecording() {
       this.isRecording = true;
+      // this.recordingStop = false;
       this.mediaRecorder = new MediaRecorder(this.audioStream);
       this.mediaRecorder.start();
 
@@ -282,7 +287,7 @@ export default {
       this.mediaRecorder.onstop = () => {
         this.audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
         this.audioChunks = [];
-        
+
         this.uploadRecording();
       };
 
@@ -290,7 +295,7 @@ export default {
     stopRecording() {
       if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
         this.mediaRecorder.stop();
-       
+
       }
     },
     stopListening() {
@@ -339,10 +344,10 @@ export default {
           convertedtext: this.convertedtext,
           openairesponse: this.openairesponse,
         });
-        this.isRecording = false;
+        // this.isRecording = false;
 
         console.log(this.chatJson);
-        await this.playAudio(this.convertedtext, this.detectedlanguage);
+        await this.playAudio(this.openairesponse, this.detectedlanguage);
         // this.startListening();
       } catch (error) {
         this.processing = false;
@@ -384,7 +389,9 @@ export default {
 
         this.speechSynthesisUtterance.onend = () => {
           mediaRecorder.stop();
-          this.startListening(); 
+          this.isRecording = false;
+          this.recordingStop = true;
+          this.startListening();
         };
 
       } catch (error) {
@@ -399,7 +406,7 @@ export default {
         window.speechSynthesis.resume();
         this.isPaused = false;
       }
-       this.startListening()
+      this.startListening()
     },
     stopAudio() {
       window.speechSynthesis.cancel();
@@ -409,224 +416,224 @@ export default {
 
       }
       this.isPaused = false;
-      
+
     }
   }
 
 
-//   methods: {
+  //   methods: {
 
-// clearFields(){
-//       this.transcription= ''
-//       this.translatedtext=''
-//       this.openai=''
-//       this.detectedlanguage=''
-//       this.processing=false
-//       this.convertedtext=''
-//       this.speechSynthesisUtterance= null
-//       this.chatJson=[]
+  // clearFields(){
+  //       this.transcription= ''
+  //       this.translatedtext=''
+  //       this.openai=''
+  //       this.detectedlanguage=''
+  //       this.processing=false
+  //       this.convertedtext=''
+  //       this.speechSynthesisUtterance= null
+  //       this.chatJson=[]
 
-// },
+  // },
 
-//     async startRecording() {
+  //     async startRecording() {
 
-//      // this.clearFields()
+  //      // this.clearFields()
 
-//       try {
-        
-//         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-//         this.mediaRecorder = new MediaRecorder(stream);
-//         this.mediaRecorder.start();
+  //       try {
 
-//         this.mediaRecorder.ondataavailable = (event) => {
-//           this.audioChunks.push(event.data);
-//         };
+  //         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  //         this.mediaRecorder = new MediaRecorder(stream);
+  //         this.mediaRecorder.start();
 
-//         this.mediaRecorder.onstop = () => {
-//           this.audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-//           this.audioChunks = [];
-//           this.uploadRecording()
-//         };
+  //         this.mediaRecorder.ondataavailable = (event) => {
+  //           this.audioChunks.push(event.data);
+  //         };
 
-//         this.isRecording = true;
+  //         this.mediaRecorder.onstop = () => {
+  //           this.audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+  //           this.audioChunks = [];
+  //           this.uploadRecording()
+  //         };
 
-
-// // Initialize SpeechRecognition
-//       this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-//         this.recognition.continuous = true;
-//         this.recognition.interimResults = false;
+  //         this.isRecording = true;
 
 
-//         this.recognition.onresult = (event) => {
-//           clearTimeout(this.silenceTimeout);
-//           this.silenceTimeout = setTimeout(() => {
-//             this.stopRecording();
-//           }, 2000); // Stop after 2 seconds of silence
-//         };
-
-//         this.recognition.start();
+  // // Initialize SpeechRecognition
+  //       this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  //         this.recognition.continuous = true;
+  //         this.recognition.interimResults = false;
 
 
+  //         this.recognition.onresult = (event) => {
+  //           clearTimeout(this.silenceTimeout);
+  //           this.silenceTimeout = setTimeout(() => {
+  //             this.stopRecording();
+  //           }, 2000); // Stop after 2 seconds of silence
+  //         };
 
-
-//       } catch (err) {
-//         console.error('Error accessing media devices.', err);
-//       }
-//     },
-//     stopRecording() {
-//       this.processing=true   
-//       if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-//         this.mediaRecorder.stop();
-//         this.isRecording = false;
-//       }
-
-//       if (this.recognition) {
-//         this.recognition.stop();
-//       }
-
-//     },
+  //         this.recognition.start();
 
 
 
-//     async uploadRecording() {
 
-//       if(this.chatJson.length > 0){
-//         this.chathistoryjsonString = JSON.stringify(this.chatJson);
-//       }else{
-//         this.chathistoryjsonString = JSON.stringify("");
-//       }
+  //       } catch (err) {
+  //         console.error('Error accessing media devices.', err);
+  //       }
+  //     },
+  //     stopRecording() {
+  //       this.processing=true   
+  //       if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+  //         this.mediaRecorder.stop();
+  //         this.isRecording = false;
+  //       }
 
-//       if (!this.audioBlob) return;
+  //       if (this.recognition) {
+  //         this.recognition.stop();
+  //       }
 
-//       const formData = new FormData();
-//       formData.append('file', this.audioBlob, 'audio.wav');
-//       formData.append('chathistory', this.chathistoryjsonString);
-
-//       try {
-//         const response = await COMMON_API_HTTP.post('/transcribe/', formData, {
-//           headers: {
-//             'Content-Type': 'multipart/form-data'
-//           }
-//         });
-//         this.processing=false
-//         console.log(response)
-
-
-//         this.transcription = response.data.transcription;
-//         this.translatedtext = response.data.translatedtext;
-//         this.openai = response.data.openai;
-//         this.detectedlanguage=response.data.detectedlanguage;
-//         this.convertedtext=response.data.convertedtext
-
-        
-
-
-//         console.log(this.openai)
-//         this.openairesponse = this.openai.split('\n\n')
-//         console.log(this.openairesponse)
-
-
-//         this.chatJson.push({
-//         transcription: this.transcription,
-//         translatedtext: this.translatedtext,
-//         openai: this.openai,
-//         detectedlanguage: this.detectedlanguage,
-//         convertedtext: this.convertedtext,
-//         openairesponse: this.openairesponse,
-//       });
-
-//       // this.playAudio(this.convertedtext,this.detectedlanguage)
-// console.log(this.chatJson)
-
-//       } catch (error) {
-//         this.processing=false
-//         console.error('Error uploading audio file.', error);
-//       }
-//     },
-
-
-//     async playAudio(text,detectedlanguage) {
-//       try {
-//       console.log("play audio : " + text)
-//       if (!text) {
-//         console.log('Please enter some text');
-//         return;
-//       }
-
-//       if (this.isPaused && this.speechSynthesisUtterance) {
-//             window.speechSynthesis.resume();
-//             this.isPaused = false;
-//             return;
-//           }
-//           // this.play=false
-//           // this.pause=true;
-
-
-  
-  
-//    // Create SpeechSynthesisUtterance for each segment
-//       const speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
-
-//       // Specify the language attribute
-//       // if(detectedlanguage.includes("Korean")){
-//       // speechSynthesisUtterance.lang = 'ko-KR'; // Korean language
-//       // }
+  //     },
 
 
 
-//       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-//       const mediaStreamDestination = audioContext.createMediaStreamDestination();
-//       const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
-//       let audioChunks = [];
+  //     async uploadRecording() {
 
-//       mediaRecorder.ondataavailable = (event) => {
-//         audioChunks.push(event.data);
-//       };
+  //       if(this.chatJson.length > 0){
+  //         this.chathistoryjsonString = JSON.stringify(this.chatJson);
+  //       }else{
+  //         this.chathistoryjsonString = JSON.stringify("");
+  //       }
 
-//       mediaRecorder.onstop = () => {
-//         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-//         this.audioUrl = URL.createObjectURL(audioBlob);
-//       };
+  //       if (!this.audioBlob) return;
 
-//       mediaRecorder.start();
-//       window.speechSynthesis.speak(speechSynthesisUtterance);
+  //       const formData = new FormData();
+  //       formData.append('file', this.audioBlob, 'audio.wav');
+  //       formData.append('chathistory', this.chathistoryjsonString);
 
-//       speechSynthesisUtterance.onend = () => {
-//         mediaRecorder.stop();
-//       };
- 
-  
-//   } catch (error) {
-//         console.log(error)
-//       //  CreateToaster('No Data Available', '', 'warning');
-//       }
-
-//     },
+  //       try {
+  //         const response = await COMMON_API_HTTP.post('/transcribe/', formData, {
+  //           headers: {
+  //             'Content-Type': 'multipart/form-data'
+  //           }
+  //         });
+  //         this.processing=false
+  //         console.log(response)
 
 
-//     pauseAudio() {
-     
-//           if (window.speechSynthesis.speaking && !this.isPaused) {
-//             window.speechSynthesis.pause();
-            
-//             this.isPaused = true;
-//           } else if (this.isPaused) {
-//             window.speechSynthesis.resume();
-
-//           }
-         
-//         },
-
-//         stopAudio() {
-//           window.speechSynthesis.cancel();
-//           if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-//             this.mediaRecorder.stop();
-//           }
-//           this.isPaused = false;
-//         }
+  //         this.transcription = response.data.transcription;
+  //         this.translatedtext = response.data.translatedtext;
+  //         this.openai = response.data.openai;
+  //         this.detectedlanguage=response.data.detectedlanguage;
+  //         this.convertedtext=response.data.convertedtext
 
 
-//   }
+
+
+  //         console.log(this.openai)
+  //         this.openairesponse = this.openai.split('\n\n')
+  //         console.log(this.openairesponse)
+
+
+  //         this.chatJson.push({
+  //         transcription: this.transcription,
+  //         translatedtext: this.translatedtext,
+  //         openai: this.openai,
+  //         detectedlanguage: this.detectedlanguage,
+  //         convertedtext: this.convertedtext,
+  //         openairesponse: this.openairesponse,
+  //       });
+
+  //       // this.playAudio(this.convertedtext,this.detectedlanguage)
+  // console.log(this.chatJson)
+
+  //       } catch (error) {
+  //         this.processing=false
+  //         console.error('Error uploading audio file.', error);
+  //       }
+  //     },
+
+
+  //     async playAudio(text,detectedlanguage) {
+  //       try {
+  //       console.log("play audio : " + text)
+  //       if (!text) {
+  //         console.log('Please enter some text');
+  //         return;
+  //       }
+
+  //       if (this.isPaused && this.speechSynthesisUtterance) {
+  //             window.speechSynthesis.resume();
+  //             this.isPaused = false;
+  //             return;
+  //           }
+  //           // this.play=false
+  //           // this.pause=true;
+
+
+
+
+  //    // Create SpeechSynthesisUtterance for each segment
+  //       const speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+
+  //       // Specify the language attribute
+  //       // if(detectedlanguage.includes("Korean")){
+  //       // speechSynthesisUtterance.lang = 'ko-KR'; // Korean language
+  //       // }
+
+
+
+  //       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  //       const mediaStreamDestination = audioContext.createMediaStreamDestination();
+  //       const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+  //       let audioChunks = [];
+
+  //       mediaRecorder.ondataavailable = (event) => {
+  //         audioChunks.push(event.data);
+  //       };
+
+  //       mediaRecorder.onstop = () => {
+  //         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+  //         this.audioUrl = URL.createObjectURL(audioBlob);
+  //       };
+
+  //       mediaRecorder.start();
+  //       window.speechSynthesis.speak(speechSynthesisUtterance);
+
+  //       speechSynthesisUtterance.onend = () => {
+  //         mediaRecorder.stop();
+  //       };
+
+
+  //   } catch (error) {
+  //         console.log(error)
+  //       //  CreateToaster('No Data Available', '', 'warning');
+  //       }
+
+  //     },
+
+
+  //     pauseAudio() {
+
+  //           if (window.speechSynthesis.speaking && !this.isPaused) {
+  //             window.speechSynthesis.pause();
+
+  //             this.isPaused = true;
+  //           } else if (this.isPaused) {
+  //             window.speechSynthesis.resume();
+
+  //           }
+
+  //         },
+
+  //         stopAudio() {
+  //           window.speechSynthesis.cancel();
+  //           if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+  //             this.mediaRecorder.stop();
+  //           }
+  //           this.isPaused = false;
+  //         }
+
+
+  //   }
 };
 </script>
 
