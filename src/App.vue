@@ -21,8 +21,8 @@
 
                   <button type="button" @click="startListening" :disabled="isRecording" class="btn start_btn mb-4">Start
                     Recording</button>
-                  <button type="button" @click="stopListening" :disabled="recordingStop" class="btn start_btn mb-4">Stop
-                    Recording</button>
+                  <!-- <button type="button" @click="stopListening" :disabled="recordingStop" class="btn start_btn mb-4">Stop
+                    Recording</button> -->
 
                 </div>
               </div>
@@ -344,17 +344,19 @@ export default {
           convertedtext: this.convertedtext,
           openairesponse: this.openairesponse,
         });
-        // this.isRecording = false;
-
+        this.isRecording = false;
+        if (this.convertedtext.includes('We have redirected your call to')) {
+          this.isRecording = false;
+        }
         console.log(this.chatJson);
-        await this.playAudio(this.openairesponse, this.detectedlanguage);
+        await this.playAudio(this.openairesponse, this.detectedlanguage, this.convertedtext);
         // this.startListening();
       } catch (error) {
         this.processing = false;
         console.error('Error uploading audio file.', error);
       }
     },
-    async playAudio(text, detectedlanguage) {
+    async playAudio(text, detectedlanguage, AiEnglishResponse) {
       try {
         this.stopListening()
         console.log("play audio : " + text);
@@ -388,10 +390,12 @@ export default {
         window.speechSynthesis.speak(this.speechSynthesisUtterance);
 
         this.speechSynthesisUtterance.onend = () => {
-          mediaRecorder.stop();
-          this.isRecording = false;
+          // mediaRecorder.stop();
+          // this.isRecording = false;
           this.recordingStop = true;
-          this.startListening();
+          if (!AiEnglishResponse.includes('We have redirected your call to')) {
+            this.startListening();
+          }
         };
 
       } catch (error) {
