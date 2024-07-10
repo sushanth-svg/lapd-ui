@@ -7,7 +7,7 @@
   -moz-box-sizing: border-box;
   font-family: Inter;
 }
-
+ 
 body {
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -19,75 +19,75 @@ body {
   font-weight: 400;
   color: #B6C6E3;
 }
-
+ 
 section {
   margin: 20px 0;
 }
-
+ 
 ul {
   list-style-type: none;
   padding-left: 0;
 }
-
+ 
 a {
   text-decoration: none;
   cursor: pointer;
 }
-
+ 
 .red_font {
   color: #FF3900;
 }
-
+ 
 .green_font {
   color: #1EE0AC;
 }
-
+ 
 .yellow_font {
   color: #F4BD0E;
 }
-
+ 
 .pencile_icon, .circle_check, .rotate_load, .circle_exclamation, .circle_xmark, .circle_plus {
   font-size: 16px;
 }
-
+ 
 .pencile_icon {
   color: #B6C6E3;
   margin-left: 10px;
 }
-
+ 
 .circle_check {
   color: #1EE0AC;
 }
-
+ 
 .rotate_load {
   color: #B6C6E3;
 }
-
+ 
 .circle_exclamation {
   color: #F4BD0E;
 }
-
+ 
 .circle_xmark {
   color: #FF3900;
 }
-
+ 
 .circle_plus {
   color: #B6C6E3;
   margin-left: 10px;
 }
-
+ 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
   cursor: pointer;
 }
-
+ 
 ::-webkit-scrollbar-track {
   border-radius: 0px;
   cursor: pointer;
 }
-
+ 
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background: rgba(135, 153, 171, 0.3137254902);
@@ -96,12 +96,12 @@ a {
 ::-webkit-scrollbar-thumb:hover .workspace_hidden_btn, ::-webkit-scrollbar-thumb:focus .workspace_hidden_btn, ::-webkit-scrollbar-thumb:active .workspace_hidden_btn {
   background: #8799AB !important;
 }
-
+ 
 /*----- Layout container start -----*/
 .layout_container {
   background-color: #D4E7FA;
 }
-
+ 
 /*----- Layout container start -----*/
 /*----- Search box start -----*/
 .search_box {
@@ -138,17 +138,17 @@ a {
   top: 10px;
   left: 10px;
 }
-
+ 
 /*----- Search box end -----*/
 .audio_section {
   width: 100%;
   min-height: calc(100vh - 32px);
   max-height: calc(100vh - 32px);
-  background: #082567;
+  background: #a8bff4;
   border: 1px solid #F8F8FF;
   border-radius: 12px;
 }
-
+ 
 .chat_section {
   width: 100%;
   min-height: calc(100vh - 32px);
@@ -157,7 +157,7 @@ a {
   border: 1px solid #F8F8FF;
   border-radius: 12px;
 }
-
+ 
 .chat_section_header {
   display: flex;
   align-items: center;
@@ -171,7 +171,7 @@ a {
   font-size: 24px;
   color: #082567 !important;
 }
-
+ 
 .chat_box {
   min-height: calc(100vh - 150px);
   max-height: calc(100vh - 150px);
@@ -259,36 +259,37 @@ a {
 .chat_box .lapd_chat .chat_text_div p:last-child {
   margin-bottom: 0;
 }
-
+ 
 .audio_icon {
   font-size: 60px;
   color: #FF7300;
 }
-
+ 
 .LAPD_logo{
   height: 130px;
   left: 2%;
   top: 20px;
   position: relative;
 }
-
+ 
 .LAPD_name{
   height: auto;
-  left: 45%;
-  top: -110px;
+  left: 52.5%;
+  top: -60px;
   position: relative;
+  color: #000000;
 }
-
+ 
 .Mic{
   height: 190px;
   left: 20%;
-  top: -80px;
+  top: -20%;
   position: relative;
 }
-
+ 
 .start_btn {
   height: auto;
-  top: -210px;
+  top: -150px;
   color: #FFFFFF !important;
   background-color: #FF7300 !important;
   border: 1px solid #FF7300;
@@ -302,7 +303,7 @@ a {
   background-color: transparent !important;
   border: 1px solid #FF7300;
 }
-
+ 
 .sound_box span {
   cursor: pointer;
   color: #082567;
