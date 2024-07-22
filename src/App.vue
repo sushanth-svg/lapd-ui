@@ -236,7 +236,7 @@ export default {
     // });
     // console.log(this.chatJson);
     this.stopAudio()
-    this.playAudio("Welcome to 911 emergency, how can i help you?","en","Welcome to 911 emergency, how can i help you?");
+    this.playAudio("Welcome to 9 1 1 emergency, how can i help you?","en","Welcome to 911 emergency, how can i help you?");
   },
  
   methods: {
@@ -393,8 +393,11 @@ export default {
           await new Promise(resolve => setTimeout(resolve,1000));
         }
  
-        //Find a female voice
-        const ziraVoice = voices.find(voice => voice.name === 'Microsoft Zira - English (United States)');
+        //Find a female voice for windows
+     //   const ziraVoice = voices.find(voice => voice.name === 'Microsoft Zira - English (United States)');
+
+          //Find a female voice for mac
+          const ziraVoice = voices.find(voice => voice.name === 'Samantha');
 
     if (ziraVoice) {
     this.speechSynthesisUtterance.voice = ziraVoice;
